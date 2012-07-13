@@ -1,19 +1,24 @@
 #!/bin/sh
 
 # A hudson build driver for Titanium Mobile Modules
+source $HOME/.profile
 
-export PATH=/usr/local/git/bin:$PATH
+export BASE_DIR=$HOME
 
-export TITANIUM_BUILD=/Users/nikolai/build/titanium_build
-export WORKSPACE=/Users/nikolai/build/workspace/titanium_mobile_modules
+export TITANIUM_BUILD=$BASE_DIR/build/titanium_build
+export TITANIUM_SDK="$HOME/Library/Application Support/Titanium"
+
+# useful for sedding
+TMP=`echo $TITANIUM_SDK|sed "s/\//\\\\\\\\\//g"`
+ESCAPED_TITANIUM_SDK=`echo $TMP|sed "s/\ /\\\\\\\\\\\\\\\\\ /g"`
+
+#for debug only
+#export WORKSPACE=$BASE_DIR/build/workspace/titanium_mobile_modules
 
 cd $WORKSPACE
 
-#git pull
-
 GIT_BRANCH=$1
 GIT_REVISION=`git log --pretty=oneline -n 1 | sed 's/ .*//' | tr -d '\n' | tr -d '\r'`
-#VERSION=`python $TITANIUM_BUILD/common/get_version.py | tr -d '\r'`
 PLATFORM=`python -c "import platform; print ({'Darwin':'osx','Windows':'win32','Linux':'linux'})[platform.system()]" | tr -d '\r' | tr -d '\n'`
 TIMESTAMP=`date +'%Y%m%d%H%M%S'`
 
@@ -23,9 +28,25 @@ fi
 
 # iOS modules
 
+BUILD_IOS=true
+
+if [ "$BUILD_IOS" = "true" ]; then
 for MODULE in `ls $WORKSPACE/iphone`; do
 	cd $WORKSPACE/iphone/$MODULE
 	echo "building $MODULE (iOS)..."
+
+        BUILD_CONFIG=$WORKSPACE/iphone/$MODULE/titanium.xcconfig
+	MSDK_VERSION=`grep -m1 TITANIUM_SDK_VERSION\ *= $BUILD_CONFIG | cut -d= -f2| tr -d ' '`
+
+	if [ ! -d "$TITANIUM_SDK/mobilesdk/osx/$MSDK_VERSION" ]; then
+		echo "ERROR: Required Titanium Mobile SDK $MSDK_VERSION not found."
+		continue;
+	fi
+
+	sed -i \
+		-e "s/TITANIUM_SDK\ *=\ *.*/TITANIUM_SDK\ =\ $ESCAPED_TITANIUM_SDK\/mobilesdk\/osx\/\$\(TITANIUM_SDK_VERSION\)/" \
+	$BUILD_CONFIG
+
 	./build.py  >& build.log
 	grep 'BUILD SUCCEEDED'  build.log | uniq
 	grep -q 'BUILD SUCCEEDED' build.log || cat build.log
@@ -38,16 +59,23 @@ for MODULE in `ls $WORKSPACE/iphone`; do
 	rm $STAMPED_ZIP
 	echo
 done
+fi
+
 
 # Android modules
 
-export ANDROID_SDK=/Users/vasyl/android-sdk-mac_x86
+export ANDROID_SDK=$BASE_DIR/android-sdk
+export ANDROID_NDK=$BASE_DIR/android-ndk-r8
 
+BUILD_ANDROID=true
+
+if [ "$BUILD_ANDROID" = "true" ]; then
 for MODULE in `ls $WORKSPACE/android`; do
+#	skip build.xml
+	if [ "$MODULE" = "build.xml" ]; then continue; fi
 #	for debugging of particular module
 #	if [ "$MODULE" != "urbanAirship" ]; then continue; fi
 
-	#MIN_SDK=`grep minsdk $WORKSPACE/android/$MODULE/manifest | cut -f3 -d' '`
 	MSDK_VERSION=`grep titanium.version= $WORKSPACE/android/$MODULE/build.properties.example|cut -d= -f2`
 	MODULE_DIR=$WORKSPACE/android/$MODULE
 
@@ -59,17 +87,19 @@ for MODULE in `ls $WORKSPACE/android`; do
 		SDK=`echo $SDK_BUCKET| cut -d/ -f6`
 		MSDK_VERSION_STAMP=`echo $SDK_BUCKET| cut -d- -f2`
 
-		if [ ! -d  ~/Titanium/mobilesdk/osx/$MSDK_VERSION_STAMP ]; then
-			rm -rf ~/Titanium/mobilesdk/osx/$MSDK_VERSION*
+		if [ ! -d  $TITANIUM_SDK/mobilesdk/osx/$MSDK_VERSION_STAMP ]; then
+			rm -rf $TITANIUM_SDK/mobilesdk/osx/$MSDK_VERSION*
 			s3cmd get --force $SDK_BUCKET && tar xzf $SDK -C ~/Titanium/
 			rm $SDK
 		fi	
 		MSDK_VERSION=$MSDK_VERSION_STAMP
-		TITANIUM_SDK="$HOME/Titanium/"
-	else
-		MSDK_VERSION=$MSDK_VERSION
-		TITANIUM_SDK="/Library/Application Support/Titanium/"
 	fi
+
+	if [ ! -d "$TITANIUM_SDK/mobilesdk/osx/$MSDK_VERSION" ]; then
+		echo "ERROR: Required Titanium Mobile SDK $MSDK_VERSION not found."
+		continue;
+	fi
+
 	sed s/TITANIUM_VERSION/$MSDK_VERSION/ $TITANIUM_BUILD/modules/build.properties.template > $MODULE_DIR/build.properties
 
 	TMP=`echo $TITANIUM_SDK|sed "s/\//\\\\\\\\\//g"`
@@ -84,7 +114,7 @@ for MODULE in `ls $WORKSPACE/android`; do
 	fi
 
 	cd $WORKSPACE/android/$MODULE
-	mkdir lib
+        if [ ! -d lib ]; then mkdir lib; fi
 	echo "building $MODULE (Android)..."
 
 	ant -v clean dist >& ant.log
@@ -98,5 +128,6 @@ for MODULE in `ls $WORKSPACE/android`; do
 	rm $STAMPED_ZIP
 	echo
 done
+fi
 
 $PYTHON $TITANIUM_BUILD/common/s3_cleaner.py modules $GIT_BRANCH

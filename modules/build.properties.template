@@ -1,7 +1,7 @@
 titanium.sdk=TITANIUM_SDK
 titanium.os=osx
 titanium.version=TITANIUM_VERSION
-android.sdk=/Users/vasyl/android-sdk-mac_x86
+android.sdk=/Users/nderzhak/android-sdk
 
 titanium.platform=${titanium.sdk}/mobilesdk/${titanium.os}/${titanium.version}/android
 default.android.platform=${android.sdk}/platforms/android-4
