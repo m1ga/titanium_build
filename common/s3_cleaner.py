@@ -48,7 +48,14 @@ if index_key != None:
 	for obj in objects_to_remove:
 		index.remove(obj)
 
+    if type == "modules":
+            for key in keys:
+                    for obj in index:
+                            if key.name == '%s/%s' % (prefix, obj['filename']):
+                                    obj['signed_url']=key.generate_url(expires_in=94608000)
+
 	index_key.set_contents_from_string(simplejson.dumps(index))
-	index_key.make_public()
+    if type != "modules":
+            index_key.make_public()
 
 print "Cleaned %d binaries from S3" % cleaned
