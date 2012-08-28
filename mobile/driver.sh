@@ -75,6 +75,24 @@ echo 'SDK_ARCHIVE: ' $SDK_ARCHIVE
 TARGET_EXT='master'
 export TARGET_EXT
 
+if [ $GIT_BRANCH = '3_1_X' ]
+then
+	echo 'Renaming TARGET_BRANCH Folder Ext from 3_1_X to 3.1.X'
+	TARGET_EXT='3.1.x'
+fi
+
+if [ $GIT_BRANCH = '3_0_X' ]
+then
+	echo 'Renaming TARGET_BRANCH Folder Ext from 3_0_X to 3.0.X'
+	TARGET_EXT='3.0.x'
+fi
+
+if [ $GIT_BRANCH = '2_2_X' ]
+then
+	echo 'Renaming TARGET_BRANCH Folder Ext from 2_2_X to 2.2.X'
+	TARGET_EXT='2.2.x'
+fi
+
 if [ $GIT_BRANCH = '2_1_X' ]
 then
 	echo 'Renaming TARGET_BRANCH Folder Ext from 2_1_X to 2.1.X'
