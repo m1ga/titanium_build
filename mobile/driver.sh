@@ -52,7 +52,7 @@ echo
 echo 'PATH: ' $PATH
 echo
 
-scons package_all=1 version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
+scons package_all=1 v3=1 version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
 # scons package_all=1 version_tag=$VTAG 
 
 if [ "$PYTHON" = "" ]; then
