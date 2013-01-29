@@ -28,32 +28,41 @@ echo
 #############################################################################
 
 GIT_BRANCH=$1
-echo 'GIT_BRANCH:    ' $GIT_BRANCH
+echo 'GIT_BRANCH:      ' $GIT_BRANCH
 
 TARGET_BRANCH=titanium_mobile_$GIT_BRANCH
-echo 'TARGET_BRANCH: ' $TARGET_BRANCH
+echo 'TARGET_BRANCH:   ' $TARGET_BRANCH
 
 GIT_REVISION=`git log --pretty=oneline -n 1 | sed 's/ .*//' | tr -d '\n' | tr -d '\r'`
-echo 'GIT_REVISION: ' $GIT_REVISION
+echo 'GIT_REVISION:    ' $GIT_REVISION
 
 VERSION=`python $TITANIUM_BUILD/common/get_version.py | tr -d '\r'`
-echo 'VERSION: ' $VERSION
+echo 'VERSION:         ' $VERSION
 
 TIMESTAMP=`date +'%Y%m%d%H%M%S'`
-echo 'TIMESTAMP: ' $TIMESTAMP
+echo 'TIMESTAMP:       ' $TIMESTAMP
 
 VTAG=$VERSION.v$TIMESTAMP
-echo 'VTAG: ' $VTAG
+echo 'VTAG:            ' $VTAG
 
 BASENAME=dist/mobilesdk-$VTAG
-echo 'BASENAME: '$BASENAME
+echo 'BASENAME:        ' $BASENAME
 
-echo
-echo 'PATH: ' $PATH
-echo
+echo 'PATH:            ' $PATH
 
-scons package_all=1 v3=1 version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
-# scons package_all=1 version_tag=$VTAG 
+if [ "$GIT_BRANCH" = "master" ]; then
+	echo 'NODE_APPC_BRANCH: master'
+	scons package_all=1 node-appc-branch=master version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
+elif [ "$GIT_BRANCH" = "3_1_X" ]; then
+	echo 'NODE_APPC_BRANCH: 3_1_X'
+	scons package_all=1 node-appc-branch=3_1_X version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
+elif [ "$GIT_BRANCH" = "3_0_X" ]; then
+	echo 'NODE_APPC_BRANCH: 3_0_X'
+	scons package_all=1 node-appc-branch=3_0_X version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
+else
+	echo 'NODE_APPC_BRANCH: latest stable from npm'
+	scons package_all=1 version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
+fi
 
 if [ "$PYTHON" = "" ]; then
 	PYTHON=python
