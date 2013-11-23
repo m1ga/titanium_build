@@ -6,17 +6,25 @@ var cmdr = require('commander'),
 	fs = require('fs'),
 	moment = require('moment'),
 	path = require('path'),
-	spawn = cp.spawn;
+	spawn = cp.spawn,
+	startTime = new Date;
 
 cmdr.option('-d, --dir', 'Node project dir')
 	.parse(process.argv);
+
+console.info('Node.js Module Packager\n');
+
+console.info('Command: "' + process.argv.join('" "') + '"');
+console.info('Environment:');
+console.info(process.env);
+console.info();
 
 var dir = cmdr.dir || process.cwd(),
 	pkgJsonFile = path.join(dir, 'package.json');
 
 // check that there's a package.json
 if (!fs.existsSync(pkgJsonFile)) {
-	console.error('ERROR: Couldn\'t find package.json');
+	console.error('ERROR: Couldn\'t find package.json\n');
 	process.exit(1);
 }
 
@@ -33,7 +41,7 @@ try {
 var origVersion = pkgJson.version,
 	version = origVersion;
 if (!version) {
-	console.error('ERROR: package.json missing version');
+	console.error('ERROR: package.json missing version\n');
 }
 
 // remove any old builds
@@ -61,12 +69,15 @@ exec('npm pack', function (err, stdout, stderr) {
 	fs.writeFileSync(pkgJsonFile, origPkgJson);
 
 	if (err) {
+		console.error('ERROR: ' + err);
 		console.error(stderr);
 		process.exit(1);
 	}
 
-	var src = path.join(dir, stdout.trim().split('\n').shift().trim()),
+	var branch = process.env.GIT_BRANCH.split('/').pop(),
+		src = path.join(dir, stdout.trim().split('\n').shift().trim()),
 		dest = path.join(dir, pkgJson.name + '-' + version.replace(/\-/g, '.') + '.tgz');
+
 	fs.renameSync(src, dest);
 
 	console.info('Output file: ' + dest);
@@ -75,16 +86,16 @@ exec('npm pack', function (err, stdout, stderr) {
 		cleanerArgs = [
 			path.join(commonDir, 's3_cleaner.py'),
 			pkgJson.name,
-			process.env.GIT_BRANCH
+			branhc
 		];
 
-	console.info('Executing: python "' + cleanerArgs.join('" "') + '"');
+	console.info('\nExecuting: python "' + cleanerArgs.join('" "') + '"');
 
 	var cleaner = spawn('python', cleanerArgs, { stdio: 'inherit' });
 
 	cleaner.on('close', function (code) {
 		if (code) {
-			console.error('ERROR: s3_cleaner failed');
+			console.error('\nERROR: s3_cleaner failed\n');
 			process.exit(1);
 		}
 
@@ -92,25 +103,25 @@ exec('npm pack', function (err, stdout, stderr) {
 			path.join(commonDir, 's3_uploader.py'),
 			pkgJson.name,
 			dest,
-			process.env.GIT_BRANCH,
-			process.env.GIT_REVISION,
+			branch,
+			process.env.GIT_COMMIT,
 			process.env.BUILD_URL
 		];
 
-		console.info('Executing: python "' + uploaderArgs.join('" "') + '"');
+		console.info('\nExecuting: python "' + uploaderArgs.join('" "') + '"');
 
 		var uploader = spawn('python', uploaderArgs, { stdio: 'inherit' });
 
 		uploader.on('close', function (code) {
 			if (code) {
-				console.error('ERROR: s3_uploader failed');
+				console.error('\nERROR: s3_uploader failed\n');
 				process.exit(1);
 			}
 
-			console.info('Removing ' + dest);
+			console.info('\nRemoving ' + dest);
 			fs.unlinkSync(dest);
 
-			console.info('Completed successfully');
+			console.info('Completed successfully in ' + (((new Date).getTime() - startTime.getTime()) / 1000) + ' seconds\n');
 		});
 	});
 });
