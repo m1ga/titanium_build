@@ -86,7 +86,7 @@ exec('npm pack', function (err, stdout, stderr) {
 		cleanerArgs = [
 			path.join(commonDir, 's3_cleaner.py'),
 			pkgJson.name,
-			branhc
+			branch
 		];
 
 	console.info('\nExecuting: python "' + cleanerArgs.join('" "') + '"');
