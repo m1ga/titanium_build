@@ -1,0 +1,19 @@
+{
+	"name": "ti-build-node",
+	"description": "Tools for packaging CI builds of Node.js modules",
+	"version": "0.1.0",
+	"maintainers": [
+		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"}
+	],
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/appcelerator/titanium_build.git"
+	},
+	"dependencies": {
+		"commander": "~2.1.0",
+		"moment": "~2.4.0"
+	},
+	"engines": {
+		"node": ">=0.8"
+	}
+}
