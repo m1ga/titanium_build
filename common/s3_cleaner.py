@@ -17,7 +17,7 @@ if not cfg.verify_aws():
 bucket = cfg.open_bucket()
 
 keys = []
-prefix = type+'/'+branch
+prefix = type+'/'+branch+'/'
 for key in bucket.list(prefix=prefix):
 	if key.name != prefix and key.name != prefix+'/' and key.name != prefix+'/index.json':
 		keys.append(key)

@@ -53,6 +53,9 @@ echo 'PATH:            ' $PATH
 if [ "$GIT_BRANCH" = "master" ]; then
 	echo 'NODE_APPC_BRANCH: master'
 	scons package_all=1 node-appc-branch=master version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
+elif [ "$GIT_BRANCH" = "3_2_X_hybrid" ]; then
+	echo 'NODE_APPC_BRANCH: 3_2_X'
+	scons package_all=1 node-appc-branch=3_2_X version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
 elif [ "$GIT_BRANCH" = "3_2_X" ]; then
 	echo 'NODE_APPC_BRANCH: 3_2_X'
 	scons package_all=1 node-appc-branch=3_2_X version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
@@ -86,6 +89,12 @@ echo 'SDK_ARCHIVE: ' $SDK_ARCHIVE
 
 TARGET_EXT='master'
 export TARGET_EXT
+
+if [ $GIT_BRANCH = '3_2_X_hybrid' ]
+then
+	echo 'Renaming TARGET_BRANCH Folder Ext from 3_2_X_hybrid to 3.2.x_hybrid'
+	TARGET_EXT='3.2.x_hybrid'
+fi
 
 if [ $GIT_BRANCH = '3_2_X' ]
 then
