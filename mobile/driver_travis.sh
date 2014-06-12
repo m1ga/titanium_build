@@ -74,7 +74,7 @@ echo 'BUILD_URL: ' $BUILD_URL
 # e.g.,  dist/mobilesdk-2.1.0.v20120518163317-osx.zip
 
 echo
-SDK_ARCHIVE="$BASENAME-osx.zip"
+export SDK_ARCHIVE="$BASENAME-osx.zip"
 echo 'SDK_ARCHIVE: ' $SDK_ARCHIVE
 
 echo
