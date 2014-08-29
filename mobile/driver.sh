@@ -53,6 +53,9 @@ echo 'PATH:            ' $PATH
 if [ "$GIT_BRANCH" = "master" ]; then
 	echo 'NODE_APPC_BRANCH: master'
 	scons package_all=1 node-appc-branch=master version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
+elif [ "$GIT_BRANCH" = "3_4_X" ]; then
+	echo 'NODE_APPC_BRANCH: 3_4_X'
+	scons package_all=1 node-appc-branch=3_4_X version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
 elif [ "$GIT_BRANCH" = "3_3_X" ]; then
 	echo 'NODE_APPC_BRANCH: 3_3_X'
 	scons package_all=1 node-appc-branch=3_3_X version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
@@ -92,6 +95,12 @@ echo 'SDK_ARCHIVE: ' $SDK_ARCHIVE
 
 TARGET_EXT='master'
 export TARGET_EXT
+
+if [ $GIT_BRANCH = '3_4_X' ]
+then
+	echo 'Renaming TARGET_BRANCH Folder Ext from 3_4_X to 3.4.X'
+	TARGET_EXT='3.4.x'
+fi
 
 if [ $GIT_BRANCH = '3_3_X' ]
 then
@@ -236,7 +245,7 @@ echo
 echo Going to s3 Uploader
 echo
 
-$PYTHON $TITANIUM_BUILD/common/s3_cleaner.py mobile $GIT_BRANCH
+# $PYTHON $TITANIUM_BUILD/common/s3_cleaner.py mobile $GIT_BRANCH
 $PYTHON $TITANIUM_BUILD/common/s3_uploader.py mobile $BASENAME-osx.zip $GIT_BRANCH $GIT_REVISION $BUILD_URL
 $PYTHON $TITANIUM_BUILD/common/s3_uploader.py mobile $BASENAME-linux.zip $GIT_BRANCH $GIT_REVISION $BUILD_URL
 $PYTHON $TITANIUM_BUILD/common/s3_uploader.py mobile $BASENAME-win32.zip $GIT_BRANCH $GIT_REVISION $BUILD_URL
