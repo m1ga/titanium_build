@@ -36,7 +36,7 @@ echo 'TARGET_BRANCH:   ' $TARGET_BRANCH
 GIT_REVISION=`git log --pretty=oneline -n 1 | sed 's/ .*//' | tr -d '\n' | tr -d '\r'`
 echo 'GIT_REVISION:    ' $GIT_REVISION
 
-VERSION=`python $TITANIUM_BUILD/common/get_version.py | tr -d '\r'`
+VERSION=`python "$TITANIUM_BUILD/common/get_version.py" | tr -d '\r'`
 echo 'VERSION:         ' $VERSION
 
 TIMESTAMP=`date +'%Y%m%d%H%M%S'`
