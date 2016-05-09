@@ -59,7 +59,9 @@ echo 'GOOGLE_APIS:     ' $GOOGLE_APIS
 
 echo 'NODE_APPC_BRANCH: $GIT_BRANCH'
 scons package_all=1 node-appc-branch=$GIT_BRANCH version_tag=$VTAG $TI_MOBILE_SCONS_ARGS
-
+if [[ $? -ne 0 ]] ; then
+    exit 1
+fi
 
 if [ "$PYTHON" = "" ]; then
 	PYTHON=python
