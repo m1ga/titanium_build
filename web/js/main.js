@@ -1,26 +1,29 @@
 $(document).ready(function() {
+	var descriptionsMasterBranch = {
+		mobile: {
+			osx: "OSX (iOS, Android, Mobile Web, BlackBerry)",
+			linux: "Linux (Android, Mobile Web)",
+			win32: "Windows (Android, Mobile Web, BlackBerry, Windows)"
+		}
+	};
+
 	var descriptions = {
 		mobile: {
-			osx: "OSX (iPhone, Android)",
-			linux: "Linux (Android only)",
-			win32: "Windows (Android only)"
-		},
-		desktop: {osx: "OSX", linux: "Linux", win32: "Windows"}
+			osx: "OSX (iOS, Android, Mobile Web)",
+			linux: "Linux (Android, Mobile Web)",
+			win32: "Windows (Android, Mobile Web)"
+		}
 	};
 
 	var mobileGitUrl = "http://github.com/appcelerator/titanium_mobile/commit/";
-	var desktopGitUrl = "http://github.com/appcelerator/titanium_desktop/commit/";
-	var showMobileBranch, showDesktopBranch;
+	var showMobileBranch;
 	var params = $.deparam.querystring();
 	if ("mobile_branch" in params) {
 		showMobileBranch = params.mobile_branch;
 	}
-	if ("desktop_branch" in params) {
-		showDesktopBranch = params.desktop_branch;
-	}
 
 	function appendRevision(type, revision, files) {
-		var url = (type=="mobile" ? mobileGitUrl : desktopGitUrl) + revision;
+		var url = mobileGitUrl + revision;
 		
 		var date = new Date();
 		if (files.length > 0) {
@@ -49,7 +52,7 @@ $(document).ready(function() {
 	function appendFile(type, revision, file) {
 		var platform = getPlatform(file);
 		var branch = file.git_branch || 'master';
-		var platformDesc = descriptions[type][platform];
+		var platformDesc = (branch == 'master' ? descriptionsMasterBranch : descriptions)[type][platform];
 		var size = "" + Math.round(file.size/1024.0/1024.0*100.0)/100.0 + " MB";
 		var fileUrl = 'http://builds.appcelerator.com.s3.amazonaws.com/'
 			+ type + '/' + branch + '/' + file.filename;
@@ -69,9 +72,7 @@ $(document).ready(function() {
 		select.attr('disabled', null);
 		
 		var defaultBranch = 'master';
-		if (showDesktopBranch && type == "desktop") {
-			defaultBranch = showDesktopBranch;
-		} else if (showMobileBranch && type == "mobile") {
+		if (showMobileBranch && type == "mobile") {
 			defaultBranch = showMobileBranch;
 		} else if ('defaultBranch' in branches) {
 			defaultBranch = branches.defaultBranch;
@@ -149,8 +150,5 @@ $(document).ready(function() {
 
 	$.getJSON("mobile/branches.json", function(data) {
 		loadBranches('mobile', data);
-	});
-	$.getJSON("desktop/branches.json", function(data) {
-		loadBranches('desktop', data);
 	});
 });
