@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=0">
+	<title>Appcelerator Continuous Builds</title>
+	<link rel="icon" type="image/png" href="/img/favicon.png">
+	<link rel="shortcut icon" type="image/png" href="/img/favicon.png">
+	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<style>
+	@font-face {
+		font-family: PlexesMediumPro;
+		src: url("fonts/20CD0A_1_0.eot") format("embedded-opentype"), url("fonts/20CD0A_1_0.woff") format("woff"), url("fonts/20CD0A_1_0.ttf") format("truetype");
+	}
+	body {
+		margin-bottom: 50px;
+	}
+	header {
+		background-color: #000;
+		height: 60px;
+		position: fixed;
+		width: 100%;
+		z-index: 1;
+	}
+	header img {
+		float: left;
+		margin: 10px 10px 0 0;
+	}
+	header h1 {
+		color: #fff;
+		float: left;
+		font-family: PlexesMediumPro,'Heletica Neue',Tahoma,Arial,sans-serif;
+		font-size: 22px;
+		line-height: 60px;
+		margin: 0;
+		text-transform: lowercase;
+	}
+	a {
+		color: #9C000B;
+	}
+	a:hover {
+		color: #CD1625;
+	}
+	h4 {
+		text-transform: uppercase;
+	}
+	.nav-list>.active>a, .nav-list>.active>a:hover, .nav-list>.active>a:focus {
+		background-color: #9C000B;
+	}
+	.well-container {
+		margin-top: 10px;
+		position: fixed;
+		width: 200px;
+		z-index: 1;
+	}
+	.well-container .well {
+		padding-left: 0;
+		padding-right: 0;
+	}
+	#builds-list > li {
+		border-top: 1px solid #E1E1E1;
+		display: block;
+		overflow: hidden;
+		padding: 1em 0 1em;
+		position: relative;
+	}
+	#builds-list > li:first-child {
+		border: 0;
+		margin: 0;
+	}
+	#builds-list > li.new:after {
+		background-color: #9C000B;
+		border: solid 1px #fff;
+		outline: solid 1px #9C000B;
+		color: #fff;
+		content: 'NEW';
+		font-weight: bold;
+		line-height: 24px;
+		padding: 0 50px;
+		position: absolute;
+		right: -34px;
+		top: 20px;
+		-webkit-transform: rotate(45deg);
+		-moz-transform: rotate(45deg);
+		-ms-transform: rotate(45deg);
+		transform: rotate(45deg);
+	}
+	.container {
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+	#content {
+		padding-top: 80px;
+	}
+	.dl-horizontal {
+		margin: 0 0 10px;
+	}
+	.osInfo .dl-horizontal {
+		padding-left: 25px;
+	}
+	.dl-horizontal dt {
+		font-size: 80%;
+		text-align: left;
+		line-height: 1.5em;
+		width: 5em;
+	}
+	.dl-horizontal dd {
+		font-size: 80%;
+		line-height: 1.5em;
+		margin-left: 6em;
+	}
+	.size {
+		font-size: 75%;
+		font-weight: bold;
+	}
+	.osInfo {
+		margin-top: 5px;
+		max-width: 430px;
+	}
+	.osInfo a {
+		font-weight: bold;
+		padding-left: 24px;
+	}
+	.osx {
+		background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA9gD2APbboEbJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkCFwINMRiHBwAAAlBJREFUOMudk81LVFEYxn/nzL1z50vTMhVUspACF+Yi+gaFEILchC2lCAmiTbs2QrTIbf9EtXHRIogkbZX24UBZBOIH5lfpaI4fM3Nn5t5zz2khpjEJ0bt64D3v733OOTzwD7W6lLrN/9bC7PzDB733zX59sSOePf8U3ch4lEVtwraFsaHjQlPn0yeP+8sSZdSfaIsprfC8Aq3NdaqmKuEDyB3AVs53fSw3ZDuuE4u68Vjcff1mon94JElTaxtOxHKltFw/kG6h6PXuzFk7YnHVxbdiCEuT8DwS5TFG37+lveMyjh1mYz2LklHcYohsLvv7CrsOXI9vP7aYWtzi5UCSqe+bJEeHaW45zeTkNENDAxQ8hac0oClx4PqKuZ+KTN5D6QjjMymciA0iRigcp7ruKKroE6gAI2UpQPmGlaxLUTkknDgT05O0NB4jWygSSRziSOMB8l5AYAyGUCnAaIPvBaxpRc5T5FOL5Gc+ksvmudZ9BxVotAZjDEJQ+gYSkCrAbG1Q9HxExXHWKi7x5esYgYblpQXW0ymQYu/v7zrQxgCG0GYaubKEsC2skGR5fpZHfXcJSYsrV2+QKK9CaFMKQEBgW8j6RmytCGGQRlFMHeT6rXtUVlYhrTD5otqzfy9ACqLhMBFbELHC2JYFaDJWnKrqwzhOnCDQKBWA+IuDrvaGz50X/ZNSiO0NYvvcgH2GufERzp47T6A1JiqIR6JjJYDW5trOQAcNfwZFIP22nsHBVz03u7v6srnMCyklNbW17/45jem19Knkh+S+afwFt7EDCVXK4i4AAAAASUVORK5CYII=) no-repeat left;
+	}
+	.linux {
+		background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA9gD2APbboEbJAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH1wkCFwAQYCiJXAAAAt1JREFUOMuFkktoE2EUhc//zz+PTCadtkmp4iOWYttAVBCMqGipj7pQdCGILhSKuNSCIAiuBPENIioogpsqLq0oKCK4kCqIiq/aUksbjWkbEzuJnTjv+V0U1ErRuz7n495zD8Es09bWBlmW5ZaWlhVhGDb29fUNFIvFwSAIwr+1bDZAQ0NDNJ1O9zQ1NW0XBIFKkuT09vYetCzrGgD+p1aYDVCpVNKMsWP9/f2RKdPE6Mgoy+U+65zzOwCs/24Qr6+T2zNLmewUADmGmkgzXr18oYeABmDyv4BGpYxNC59iVWYBvOowbj4ooodyxQ8g/a2ls/jph7zf8UVcpdp19QiSHVi0uhuKGk2KorgDAPlnBqlUapcWix3ftadbhbYJU34KUiSODwODrFgsrUylUt9UVX1lGMZMgKIoyGQyS4IguN7ZuXnOlq3bUFsXRySqAZRBliN48/atLAjCOtu275fL5cIMQDKZFCilZxKJxNquri6SiMfhui48zwOlFDU1MWSzWeTzY0oQBLLneQ89z/N/AVzX0WNR5XznxvXaiuXLIAoEoe8i9F0EnoPQd0DAMWkYGB4ets1q9TbnvMoAoHSxXTKJum5Snq+/GyugkB9FfawVhEznxQmgfR/Apxf3YZbGcXxnk9SsB5HO069Bvl1uF1SNnZfmLdtH65vV8ZEBHLr0CHsPHMGalct//3voDoidg884NLz3LNM5ahniOUYUR6CJSopKz1X8KGFuXMTJva2o6kBEmr6w9HUCavUd9NhnIGoBEUMUbbLHriZusKxZweKYVSC1xbKAnEa5zBbKIq7cOuUcPlE3xTn3Jyeycu/ZqK432jQQfLcwKt3MfRSuPukbK7DuniF39/s5+wUWxBfMp61taWsDYCXGJsxnlU+DBiXgiahEDJOtV76Hc/Mj0t0TF77eyxnO1A8F4YxWdSwCPAbCoiCCAxqS6dZRDh7ICP0quOiDP87+9vwEkAYv0fzd81AAAAAASUVORK5CYII=) no-repeat left;
+	}
+	.win32 {
+		background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA9gD2APbboEbJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkCFwIz8HmarAAAAsVJREFUOMt9k01oVFcYhp9z7pxz5869Y340GrQGWqpU0diC0BbTNsWFrbS4qVB/Ag1IKXRTl4KLZCFuXBREF9JNF7WLQKktXYi4KAiRijYpEmJJ0NgJ0XQycebemfs797gITazUvrsPPh6+n/cVPCfzJQUUZVqUoxaNYkxdjGF4gcSzRX6CATRD2Di02LO0jDf1F5crdc4em6L1X4DCc/Uwkm3k+KZNbxCysRZw8sZ+Jo8fYebVASZH3l+Z5tR1vMrvdK8CzAm0EezFYp42XpbhNkIIUyZrLp+VirzRjLhx7k+mvQ1s+vs+b8ZNLq0CckO/sCgiSUjYnCTYfgiB5paBo9qlRzt8Yruk0kKGdazWErfl6jEE72ER5AZj2qxrxlh+SF7ZwbKA9aoMuoTRDiQhlr/IfFBlanWCJzF7GlFhop7ad1yT305a0cEwNVvnXmK9cpDKBbtEbmnwa4igxvjgdoIVwG6j3r579Yd7YsCg3E7amS5XJ85f7PlgMVRLo2UPtIvRDgaBCOuIYJHrIyOwsoLLznv6wEcU3C3AVtL4dT90v/riwTc7XlP8YhX4EahkCUvVGWYbfzAWLfDT2hsN/UADyDGUSKISaVQ88O739GlO7/cY74j41p3HbCyxq9JJ33eK+s+A5C0jgZ0YniBRmNwhDl3aaXOg/0qvXaDk2Qz2Onz+yjqGy4pDzSZzZ84TAkgEXQg2IfAxOLSzEknkkkcTTiF+xyuCY5PZilQKnLZBzi1yTYh/nJjE28lzn2ajhRQCZEASq57O6SkJQ54DWpFpRYagWA9Ipx/y65qVqwuPCKoX8ecfkByK6brZhSx++OnBS9oC17UxtiLRBTAG+3GN2ayDmTXA3Mv3/5WGZZaBy90b6A0FX2eCj2ODeuwTV33u3H3IhdHRtXQK/keHDyP27aVDS7qbMdFvC9TGLhA92/MUtdolkY1chL4AAAAASUVORK5CYII=) no-repeat left;
+	}
+	</style>
+</head>
+<body>
+
+<header>
+	<div class="container">
+		<div class="row">
+			<div class="span11 offset1">
+				<img src="img/appc.png"/>
+				<h1>Titanium Mobile Continuous Builds</h1>
+			</div>
+		</div>
+	</div>
+</header>
+
+<div class="container" id="content">
+	<div class="row">
+		<div class="span3 offset1">
+			<div class="well-container">
+				<div class="well" id="releases-well"></div>
+				<div class="well" id="branches-well"></div>
+				<div class="well" id="docs-well"></div>
+			</div>
+		</div>
+		<div class="span6">
+			<ul class="unstyled" id="builds-list"></ul>
+		</div>
+	</div>
+</div>
+
+<script type="text/template" id="build-template">
+	<h4><%= date.toDateString().replace(' '+date.getFullYear(), ', '+date.getFullYear()) %> <small><%= date.toLocaleTimeString() %></small></h4>
+	<!--
+	<iframe frameborder="0" width="100%" height="30px" src="http://anvil.appcelerator.com/build.php?git_hash=<%= rev %>"></iframe>
+	-->
+	<dl class="dl-horizontal">
+		<dt>version:</dt>
+		<dd><%= version %></dd>
+		<dt>git hash:</dt>
+		<dd><a href="https://github.com/appcelerator/titanium_mobile/commit/<%= rev %>" target="_blank"><%= rev %></a></dd>
+		<dt>jenkins:</dt>
+		<dd><a href="<%= jenkinsUrl %>" target="_blank">Job #<%= jenkinsJob %></a></dd>
+		<dt>parity:</dt>
+		<dd><a href="<%= parityUrl %>" target="_blank">parity report</a></dd>
+	</dl>
+</script>
+
+<script type="text/template" id="release-build-template">
+	<h4><%= version %> <small><%= label %></small></h4>
+	<dl class="dl-horizontal">
+		<dt>version:</dt>
+		<dd><%= rev %></dd>
+	</dl>
+</script>
+
+<script type="text/template" id="doc-template">
+	<h4><%= date.toDateString().replace(' '+date.getFullYear(), ', '+date.getFullYear()) %> <small><%= date.toLocaleTimeString() %></small></h4>
+</script>
+
+<script type="text/template" id="os-template">
+	<span class="pull-right size"><%= size %></span>
+	<a class="<%= os %>" href="<%= url %>"><%= title %></a><br/>
+	<dl class="dl-horizontal">
+		<dt>filename:</dt>
+		<dd><%= filename %></dd>
+		<dt>sha1:</dt>
+		<dd><%= sha1 %></dd>
+		<% if (os != "no-os") { %>
+		<dt>install:</dt>
+			<% if (branch) { %>
+				<dd>appc ti sdk install --branch <%= branch %> <%= displayName %></dd>
+			<% } else { %>
+				<dd>appc ti sdk install <%= url %></dd>
+			<% } %>
+		<% } %>
+	</dl>
+</script>
+
+<script src="js/jquery-2.1.0.min.js"></script>
+<script src="js/jquery.cookie.js"></script>
+<script src="js/underscore-min.js"></script>
+<script src="js/backbone-1.1.2-min.js"></script>
+
+<script>
+$(function () {
+	var domain = 'http://builds.appcelerator.com',
+		platformsAll = {
+			'osx': 'OS X (iOS, Android, Mobile Web, BlackBerry)',
+			'linux': 'Linux (Android, Mobile Web, BlackBerry)',
+			'win32': 'Windows (Android, Mobile Web, BlackBerry)'
+		},
+		platforms = {
+			// releases
+			'3.2.3': platformsAll,
+			// branches
+			'master': platformsAll,
+			'3_1_X': platformsAll,
+			'3_2_X': platformsAll,
+			'3_2_X_hybrid': platformsAll,
+			'3_3_X': platformsAll,
+			'default': {
+				'osx': 'OS X (iOS, Android, Mobile Web)',
+				'linux': 'Linux (Android, Mobile Web)',
+				'win32': 'Windows (Android, Mobile Web)'
+			},
+			'docs': {'no-os': 'Titanium Documentation'}
+		},
+
+		App = Backbone.Router.extend({
+			routes: {
+				':name': 'showBuilds',
+				'*name': 'showBuilds' // default route
+			},
+			showBuilds: showBuilds
+		}),
+		app = new App,
+
+		ReleasesModel = Backbone.Model.extend({
+			url: domain + '/mobile/releases.json',
+			title: 'Releases',
+			type: 'releases'
+		}),
+
+		BranchesModel = Backbone.Model.extend({
+			url: domain + '/mobile/branches.json',
+			title: 'Branches',
+			type: 'branches'
+		}),
+
+		DocsModel = Backbone.Model.extend({
+			url: domain + '/mobile/docs.json',
+			title: 'Docs',
+			type: 'docs'
+		}),
+
+		WellView = Backbone.View.extend({
+			events: {
+				'click .nav-branches,click .nav-releases,click .nav-docs': function () {
+					$('body,html').animate({
+						scrollTop: 0
+					}, 500);
+				}
+			},
+			render: function () {
+				var type = this.model.type;
+				this.$el.html('<ul class="nav nav-list"><li class="nav-header">' + this.model.title + '</li>' + this.model.attributes[type].sort().reverse().map(function (name) {
+					return '<li class="nav-' + type + '" id="' + type + '_' + name.replace(/\./g, '') + '"><a href="#' + name + '">' + name + '</a></li>';
+				}, this).join('') + '</ul>');
+				return this;
+			},
+			select: function (name) {
+				setTimeout(function () {
+					var t = this.model.type;
+					Object.keys(views).forEach(function (type) {
+						if (type != t) {
+							$('li', views[type].el).removeClass('active');
+						}
+					});
+					$('#' + t + '_' + name.replace(/\./g, '')).addClass('active').siblings().removeClass('active');
+				}.bind(this), 250);
+			}
+		}),
+
+		views = {
+			releases: new WellView({
+				el: '#releases-well',
+				model: new ReleasesModel
+			}),
+			branches: new WellView({
+				el: '#branches-well',
+				model: new BranchesModel
+			}),
+			docs: new WellView({
+				el: '#docs-well',
+				model: new DocsModel
+			})
+		},
+
+		OSView = Backbone.View.extend({
+			className: 'osInfo',
+			template: _.template($('#os-template').html()),
+			render: function () {
+				this.model.attributes.size = (Math.round(this.model.attributes.size / 1024 / 1024 * 100) / 100) + 'MB';
+				this.$el.html(this.template(this.model.attributes));
+				return this;
+			}
+		}),
+		BuildView = Backbone.View.extend({
+			tagName: 'li',
+			render: function () {
+				this.template = _.template($(this.model.attributes.template).html());
+				this.el.setAttribute('data-ts', this.model.attributes.ts);
+				this.el.innerHTML = this.template(this.model.attributes);
+				this.model.attributes.os.forEach(function (os) {
+					var v = new OSView({
+						model: new Backbone.Model(os)
+					});
+					this.el.appendChild(v.render().el);
+				}, this);
+				return this;
+			}
+		}),
+
+		BuildsCollection = Backbone.Collection.extend({
+			model: Backbone.Model.extend({
+				idAttribute: 'date'
+			})
+		}),
+		buildsCollection = new BuildsCollection,
+
+		onXhrError = function (xhr, msg) {
+			if (xhr && xhr.status && xhr.status >= 400) {
+				clearInterval(refreshTimer);
+				buildsList.html('<div class="alert alert-error"><b>' + xhr.status + ': ' + xhr.statusText + '</b><br/>' + msg + '</div>');
+			}
+		},
+
+		refreshTimer = setInterval(function () {
+			showBuilds(location.hash.substring(1));
+		}, 15000),
+
+		buildsList = $('#builds-list'),
+		doingUpdate,
+		doListEffects,
+
+		releaseRegex = /^mobilesdk\-(\d\.\d\.\d+)(?:\.(.+))?\-([^\.]+)\.zip/,
+		branchRegex = /^mobilesdk\-(.+)(?:\.v|\-)((\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2}))\-([^\.]+)\.zip/,
+		docRegex = /^docs\-(\d{4})\-(\d{2})\-(\d{2})\_(\d{2})\-(\d{2})\-(\d{2})/;
+
+	function showBuilds(name) {
+		if (!name) return;
+
+		// check if name is valid
+		var type,
+			types = Object.keys(views),
+			i = 0,
+			l = types.length;
+		for (; i < l; i++) {
+			if (views[types[i]].model.attributes[types[i]].indexOf(name) != -1) {
+				type = types[i];
+				break;
+			}
+		}
+		if (!type) {
+			console.log('couldn\'t find ' + name);
+			return;
+		}
+
+		$.ajax({
+			url: domain + '/mobile/' + name + '/index.json',
+			dataType: 'json',
+			cache: false,
+			async: true,
+			success: function (data) {
+				views[type].select(name);
+				$.cookie('selected', name, { expires: 7, path: '/' });
+
+				var records = {};
+
+				for (var i = 0, l = data.length; i < l; i++) {
+					var build = data[i],
+						p = build.filename.match(branchRegex),
+						key = p && p[2],
+						record = {
+							version: null,
+							label: null,
+							date: null,
+							ts: null,
+							parityUrl: null,
+							jenkinsUrl: null,
+							jenkinsJob: null,
+							rev: null,
+							os: [],
+							shas: []
+						},
+						os = {
+							name: name,
+							branch: null,
+							displayName: '',
+							os: null,
+							filename: build.filename,
+							title: null,
+							url: domain + '/mobile/' + name + '/' + build.filename,
+							size: build.size,
+							sha1: build.sha1
+						};
+
+					if (key) {
+						// it's a branch build;
+						if (!records[key]) {
+							var job = build.build_url.match(/\/(\d+)\/?$/);
+							record.version = p[1];
+							record.template = '#build-template';
+							record.date = new Date(p.slice(4, 6).join('/') + '/' + p[3] + ' ' + p.slice(6, 9).join(':')),
+							record.ts = key,
+							record.jenkinsUrl = build.build_url,
+							record.jenkinsJob = job && job[1] || '?',
+							record.parityUrl = domain + '/mobile/' + name + '/mobilesdk-' + p[1] + '.v' + p[2] + '-parity.html',
+							record.rev = build.git_revision;
+							records[key] = record;
+						}
+
+						os.branch = name;
+						os.displayName = records[key].version + '.v' + p[2];
+
+					} else if (name == "docs") {
+						p = build.filename.match(docRegex);
+						if (!p) continue;
+						key = p.slice(1, 7).join('');
+						if (!key) continue;
+						if (!records[key]) {
+							record.template = '#doc-template';
+							record.date = new Date(p.slice(1,4).join('-') + ' ' + p.slice(4,7).join(":"));
+							records[key] = record;
+						}
+						p.push("no-os");
+
+					} else {
+						p = build.filename.match(releaseRegex);
+						key = p && p[2];
+						if (!key) continue;
+						if (!records[key]) {
+							record.template = '#release-build-template';
+							record.version = p[1];
+							record.label = key;
+							record.rev = build.git_revision;
+							records[key] = record;
+						}
+						os.displayName = records[key].version + '.' + records[key].label;
+					}
+
+					os.os = p[p.length-1];
+					os.title = (platforms[name] || platforms['default'])[p[p.length-1]];
+					records[key].os.push(os);
+					records[key].shas.push(build.sha1);
+				}
+				doingUpdate = buildsCollection.selected === name;
+
+				// check that every build has 3 platforms
+				if (name != "docs") {
+					Object.keys(records).forEach(function (name) {
+						if (records[name].os.length < 3) {
+							console.log(name);
+							delete records[name];
+						}
+					});
+				}
+
+				buildsCollection[buildsCollection.selected === name ? 'set' : 'reset'](Object.keys(records).sort().reverse().map(function (d) {
+					return records[d];
+				}));
+
+				doingUpdate = false;
+
+				buildsCollection.selected = name;
+			},
+			error: function (xhr) {
+				onXhrError(xhr, 'Unable to load builds. Try <a href="javascript:location.reload()">reloading the page</a>.<br/><small>' + this.url + '</small>');
+			}
+		});
+	}
+
+	function renderBuildsList(model, collection, options) {
+		if (!model.view) {
+			if (doingUpdate) {
+				$('#builds-list > li.new').removeClass('new');
+				doingUpdate = false;
+			}
+
+			var v = model.view = new BuildView({
+					model: model
+				}),
+				el = v.render().el,
+				ts = model.attributes.ts - 0,
+				listNode = buildsList[0],
+				node = listNode.firstChild;
+
+			while (node) {
+				if (node.nodeType == 1 && node.getAttribute('data-ts')-0 < ts) {
+					listNode.insertBefore(el, node);
+					if (doListEffects) {
+						el.style.display = 'none';
+						$(el).addClass('new').slideDown(800);
+					}
+					break;
+				}
+				node = node.nextSibling;
+			}
+			node || listNode.appendChild(el);
+		}
+	}
+
+	buildsCollection.on({
+		'reset': function (collection) {
+			buildsList.empty();
+			doListEffects = false;
+			collection.models.forEach(function (m) {
+				renderBuildsList(m, collection);
+			});
+			doListEffects = true;
+		},
+		'add': renderBuildsList,
+		'remove': function (model, collection, options) {
+			if (doingUpdate) {
+				$('#builds-list > li.new').removeClass('new');
+				doingUpdate = false;
+			}
+			if (model.view) {
+				var el = $(model.view.el);
+				el.fadeTo(800, 0).slideUp(800, function () {
+					el.remove();
+				});
+			}
+		}
+	});
+
+	var modelLoaded = _.after(Object.keys(views).length, function () {
+		// get the first release
+		Backbone.history.start();
+		var r = (views.releases.model.attributes.releases || []).sort().reverse();
+		app.navigate($.cookie('selected') || r[0], { trigger: true });
+	});
+
+	Object.keys(views).forEach(function (type) {
+		views[type].model.fetch({
+			success: function (model, resp, options) {
+				views[type].render();
+				modelLoaded();
+			},
+			error: function (model, xhr, options) {
+				onXhrError(xhr, 'Unable to load ' + type + '. Try <a href="javascript:location.reload()">reloading the page</a>.<br/><small>' + model.url + '</small>');
+				modelLoaded();
+			}
+		});
+	});
+});
+</script>
+</body>
+</html>
