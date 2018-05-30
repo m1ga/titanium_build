@@ -1,57 +1,22 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html>
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=0">
-	<title>Appcelerator Continuous Builds</title>
-	<link rel="icon" type="image/png" href="/img/favicon.png">
-	<link rel="shortcut icon" type="image/png" href="/img/favicon.png">
-	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<title>Appcelerator Build Server</title>
+    <meta charset="utf8">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,800,700,300,600' rel='stylesheet' type='text/css'>
+	<link rel="shortcut icon" type="image/png" href="images/appc-favicon.ico">
+    <link rel="stylesheet" type="text/css" href="css2/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css2/style.css">
+    <link rel="stylesheet" href="css2/animate.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
-	@font-face {
-		font-family: PlexesMediumPro;
-		src: url("fonts/20CD0A_1_0.eot") format("embedded-opentype"), url("fonts/20CD0A_1_0.woff") format("woff"), url("fonts/20CD0A_1_0.ttf") format("truetype");
-	}
-	body {
-		margin-bottom: 50px;
-	}
 	header {
-		background-color: #000;
-		height: 60px;
-		position: fixed;
-		width: 100%;
-		z-index: 1;
-	}
-	header img {
-		float: left;
-		margin: 10px 10px 0 0;
-	}
-	header h1 {
-		color: #fff;
-		float: left;
-		font-family: PlexesMediumPro,'Heletica Neue',Tahoma,Arial,sans-serif;
-		font-size: 22px;
-		line-height: 60px;
-		margin: 0;
-		text-transform: lowercase;
-	}
-	a {
-		color: #9C000B;
-	}
-	a:hover {
-		color: #CD1625;
-	}
-	h4 {
-		text-transform: uppercase;
-	}
-	.nav-list>.active>a, .nav-list>.active>a:hover, .nav-list>.active>a:focus {
-		background-color: #9C000B;
+		padding-bottom:5px;
+		background-color: #252525;
 	}
 	.well-container {
 		margin-top: 10px;
-		position: fixed;
+		float: left;
 		width: 200px;
 		z-index: 1;
 	}
@@ -59,11 +24,15 @@
 		padding-left: 0;
 		padding-right: 0;
 	}
+	#builds-list {
+		margin-left:240px;
+		margin-bottom:40px;
+	}
 	#builds-list > li {
 		border-top: 1px solid #E1E1E1;
 		display: block;
 		overflow: hidden;
-		padding: 1em 0 1em;
+		padding: 0 1em;
 		position: relative;
 	}
 	#builds-list > li:first-child {
@@ -87,12 +56,16 @@
 		-ms-transform: rotate(45deg);
 		transform: rotate(45deg);
 	}
-	.container {
+	#builds-list > li > h4 {
+		color: #252525;
+	}
+	.container2 {
 		padding-left: 20px;
 		padding-right: 20px;
+		min-height: 430px;
 	}
 	#content {
-		padding-top: 80px;
+		padding-top: 20px;
 	}
 	.dl-horizontal {
 		margin: 0 0 10px;
@@ -132,28 +105,31 @@
 	.win32 {
 		background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA9gD2APbboEbJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wkCFwIz8HmarAAAAsVJREFUOMt9k01oVFcYhp9z7pxz5869Y340GrQGWqpU0diC0BbTNsWFrbS4qVB/Ag1IKXRTl4KLZCFuXBREF9JNF7WLQKktXYi4KAiRijYpEmJJ0NgJ0XQycebemfs797gITazUvrsPPh6+n/cVPCfzJQUUZVqUoxaNYkxdjGF4gcSzRX6CATRD2Di02LO0jDf1F5crdc4em6L1X4DCc/Uwkm3k+KZNbxCysRZw8sZ+Jo8fYebVASZH3l+Z5tR1vMrvdK8CzAm0EezFYp42XpbhNkIIUyZrLp+VirzRjLhx7k+mvQ1s+vs+b8ZNLq0CckO/sCgiSUjYnCTYfgiB5paBo9qlRzt8Yruk0kKGdazWErfl6jEE72ER5AZj2qxrxlh+SF7ZwbKA9aoMuoTRDiQhlr/IfFBlanWCJzF7GlFhop7ad1yT305a0cEwNVvnXmK9cpDKBbtEbmnwa4igxvjgdoIVwG6j3r579Yd7YsCg3E7amS5XJ85f7PlgMVRLo2UPtIvRDgaBCOuIYJHrIyOwsoLLznv6wEcU3C3AVtL4dT90v/riwTc7XlP8YhX4EahkCUvVGWYbfzAWLfDT2hsN/UADyDGUSKISaVQ88O739GlO7/cY74j41p3HbCyxq9JJ33eK+s+A5C0jgZ0YniBRmNwhDl3aaXOg/0qvXaDk2Qz2Onz+yjqGy4pDzSZzZ84TAkgEXQg2IfAxOLSzEknkkkcTTiF+xyuCY5PZilQKnLZBzi1yTYh/nJjE28lzn2ajhRQCZEASq57O6SkJQ54DWpFpRYagWA9Ipx/y65qVqwuPCKoX8ecfkByK6brZhSx++OnBS9oC17UxtiLRBTAG+3GN2ayDmTXA3Mv3/5WGZZaBy90b6A0FX2eCj2ODeuwTV33u3H3IhdHRtXQK/keHDyP27aVDS7qbMdFvC9TGLhA92/MUtdolkY1chL4AAAAASUVORK5CYII=) no-repeat left;
 	}
-	</style>
+	</style>    
 </head>
 <body>
 
-<header>
-	<div class="container">
-		<div class="row">
-			<div class="span11 offset1">
-				<img src="img/appc.png"/>
-				<h1>Titanium Mobile Continuous Builds</h1>
+<div class="wrapper">
+	
+	<section class="intro">
+		<div class="container">
+			<div class="row">
+				<div class="content col-md-12">
+					<h2>Appcelerator Open&nbsp;Source</h2>
+					<p>As a company built on open source, we believe in its power to fuel innovation for everyone. That&rsquo;s why we&rsquo;re committed to giving back to the community and are proud that our contributions are being used by hundreds of thousands of developers worldwide.</p>
+					<a href="http://www.appcelerator.com" target="_blank" class="button-platform">Check out the Appcelerator Platform <img src="images/platform.png"></a>
+				</div>
 			</div>
 		</div>
-	</div>
-</header>
+	</section>
 
-<div class="container" id="content">
+<div class="container container2" id="content">
+	<div style="padding:10px 0px">Below are the latest untested continuous integrations builds of the Titanium SDK. Tested and certified builds are available as part of the <a href="http://www.appcelerator.com" target="_blank">Appcelerator Platform</a>.
+	</div>
 	<div class="row">
 		<div class="span3 offset1">
 			<div class="well-container">
-				<div class="well" id="releases-well"></div>
 				<div class="well" id="branches-well"></div>
-				<div class="well" id="docs-well"></div>
 			</div>
 		</div>
 		<div class="span6">
@@ -163,15 +139,10 @@
 </div>
 
 <script type="text/template" id="build-template">
-	<h4><%= date.toDateString().replace(' '+date.getFullYear(), ', '+date.getFullYear()) %> <small><%= date.toLocaleTimeString() %></small></h4>
-	<!--
-	<iframe frameborder="0" width="100%" height="30px" src="http://anvil.appcelerator.com/build.php?git_hash=<%= rev %>"></iframe>
-	-->
+	<h4><%= date.toDateString().replace(' '+date.getFullYear(), ', ' + date.getFullYear()) %> <%= date.toLocaleTimeString() %></h4>
 	<dl class="dl-horizontal">
 		<dt>version:</dt>
 		<dd><%= version %></dd>
-		<dt>git hash:</dt>
-		<dd><a href="https://github.com/appcelerator/titanium_mobile/commit/<%= rev %>" target="_blank"><%= rev %></a></dd>
 		<dt>jenkins:</dt>
 		<dd><a href="<%= jenkinsUrl %>" target="_blank">Job #<%= jenkinsJob %></a></dd>
 		<dt>parity:</dt>
@@ -184,7 +155,7 @@
 	<dl class="dl-horizontal">
 		<dt>version:</dt>
 		<dd><%= rev %></dd>
-	</dl>
+	</dl>	
 </script>
 
 <script type="text/template" id="doc-template">
@@ -197,8 +168,6 @@
 	<dl class="dl-horizontal">
 		<dt>filename:</dt>
 		<dd><%= filename %></dd>
-		<dt>sha1:</dt>
-		<dd><%= sha1 %></dd>
 		<% if (os != "no-os") { %>
 		<dt>install:</dt>
 			<% if (branch) { %>
@@ -224,20 +193,11 @@ $(function () {
 			'win32': 'Windows (Android, Mobile Web, BlackBerry)'
 		},
 		platforms = {
-			// releases
-			'3.2.3': platformsAll,
-			// branches
-			'master': platformsAll,
-			'3_1_X': platformsAll,
-			'3_2_X': platformsAll,
-			'3_2_X_hybrid': platformsAll,
-			'3_3_X': platformsAll,
 			'default': {
 				'osx': 'OS X (iOS, Android, Mobile Web)',
 				'linux': 'Linux (Android, Mobile Web)',
-				'win32': 'Windows (Android, Mobile Web)'
-			},
-			'docs': {'no-os': 'Titanium Documentation'}
+				'win32': 'Windows (Android, Mobile Web, Windows Phone)'
+			}
 		},
 
 		App = Backbone.Router.extend({
@@ -277,7 +237,7 @@ $(function () {
 			},
 			render: function () {
 				var type = this.model.type;
-				this.$el.html('<ul class="nav nav-list"><li class="nav-header">' + this.model.title + '</li>' + this.model.attributes[type].sort().reverse().map(function (name) {
+				this.$el.html('<ul class="nav nav-list">' + this.model.attributes[type].sort().reverse().map(function (name) {
 					return '<li class="nav-' + type + '" id="' + type + '_' + name.replace(/\./g, '') + '"><a href="#' + name + '">' + name + '</a></li>';
 				}, this).join('') + '</ul>');
 				return this;
@@ -296,17 +256,9 @@ $(function () {
 		}),
 
 		views = {
-			releases: new WellView({
-				el: '#releases-well',
-				model: new ReleasesModel
-			}),
 			branches: new WellView({
 				el: '#branches-well',
 				model: new BranchesModel
-			}),
-			docs: new WellView({
-				el: '#docs-well',
-				model: new DocsModel
 			})
 		},
 
@@ -390,8 +342,11 @@ $(function () {
 				$.cookie('selected', name, { expires: 7, path: '/' });
 
 				var records = {};
+				
+				data.reverse();
 
-				for (var i = 0, l = data.length; i < l; i++) {
+				for (var i = 0, l = 8; i < l && i < data.length; i++) {
+
 					var build = data[i],
 						p = build.filename.match(branchRegex),
 						key = p && p[2],
@@ -415,8 +370,7 @@ $(function () {
 							filename: build.filename,
 							title: null,
 							url: domain + '/mobile/' + name + '/' + build.filename,
-							size: build.size,
-							sha1: build.sha1
+							size: build.size
 						};
 
 					if (key) {
@@ -436,37 +390,14 @@ $(function () {
 
 						os.branch = name;
 						os.displayName = records[key].version + '.v' + p[2];
-
-					} else if (name == "docs") {
-						p = build.filename.match(docRegex);
-						if (!p) continue;
-						key = p.slice(1, 7).join('');
-						if (!key) continue;
-						if (!records[key]) {
-							record.template = '#doc-template';
-							record.date = new Date(p.slice(1,4).join('-') + ' ' + p.slice(4,7).join(":"));
-							records[key] = record;
-						}
-						p.push("no-os");
-
-					} else {
-						p = build.filename.match(releaseRegex);
-						key = p && p[2];
-						if (!key) continue;
-						if (!records[key]) {
-							record.template = '#release-build-template';
-							record.version = p[1];
-							record.label = key;
-							record.rev = build.git_revision;
-							records[key] = record;
-						}
-						os.displayName = records[key].version + '.' + records[key].label;
 					}
 
-					os.os = p[p.length-1];
-					os.title = (platforms[name] || platforms['default'])[p[p.length-1]];
-					records[key].os.push(os);
-					records[key].shas.push(build.sha1);
+					if(p) {
+						os.os = p[p.length-1];
+						os.title = (platforms[name] || platforms['default'])[p[p.length-1]];
+						records[key].os.push(os);
+						records[key].shas.push(build.sha1);						
+					}
 				}
 				doingUpdate = buildsCollection.selected === name;
 
@@ -551,7 +482,7 @@ $(function () {
 	var modelLoaded = _.after(Object.keys(views).length, function () {
 		// get the first release
 		Backbone.history.start();
-		var r = (views.releases.model.attributes.releases || []).sort().reverse();
+		var r = (views.branches.model.attributes.branches || []).sort().reverse();
 		app.navigate($.cookie('selected') || r[0], { trigger: true });
 	});
 
@@ -569,5 +500,71 @@ $(function () {
 	});
 });
 </script>
+
+
+	<footer>
+		<a href="" class="goToTop" title="Go to Top"><img src="images/code.png" class="code"></a>
+		<div class="container">
+			<div class="row">
+				<div class="first col-md-3 col-sm-3 col-xs-12">
+					<ul>
+						<li><a href="http://www.appcelerator.com/cat/developer">Dev Blog</a></li>
+						<li><a href="http://community.appcelerator.com">Support</a></li>
+					</ul>
+				</div>
+				<div class="col-md-3 col-md-offset-2 col-sm-4 col-xs-12">
+					<p class="big float-right">Reach out &amp; stay in touch!</p>
+				</div>
+				<div class="col-md-4 col-sm-5 col-xs-12">
+					<ul class="social float-right">
+						<li><a href="https://twitter.com/appcelerator" target="_blank">Twitter</a></li>
+						<li><a href="http://www.facebook.com/appcelerator" target="_blank">Facebook</a></li>
+						<li><a href="https://plus.google.com/113266658339161020416/" target="_blank">Google+</a></li>
+						<li><a href="http://instagram.com/appcelerator" target="_blank">Instagram</a></li>
+						<li><a href="https://github.com/appcelerator" target="_blank">Github</a></li>
+						<li><a href="http://www.linkedin.com/company/200115" target="_blank">LinkedIn</a></li>
+					</ul>
+				</div>
+				<div class="clearfix"></div>
+				<span class="line"></span>
+				<div class="col-md-8 col-sm-9 col-xs-12">
+					<p>&copy;2008&ndash;2015 Appcelerator Inc. All rights reserved. Appcelerator and Titanium are registered <a href="http://www.appcelerator.com/legal/trademark-policy/">trademarks</a>.</p>
+				</div>
+				<div class="last col-md-3 col-sm-3 col-xs-12 float-right">
+					<ul class="float-right">
+						<li><a href="http://www.appcelerator.com/legal/terms-conditions/">Terms</a></li>
+						<li><a href="http://www.appcelerator.com/legal/privacy-policy/">Privacy</a></li>
+						<li><a href="http://www.appcelerator.com/legal/">Legal</a></li>
+					</ul>
+				</div>
+
+			</div>
+		</div>
+	</footer>
+
+
+	<header>
+		<div class="container">
+			<div class="row">
+				<a href="" class="logo float-left"><img src="images/logo.png"></a>
+				<a href="" class="mobile-menu"><img src="images/nav-icon.png"></a>
+				<nav>
+					<ul class="sec-nav float-right">
+						<li><a href="#about" onClick="closeMenu()">About</a></li>
+						<li><a href="http://community.appcelerator.com" target="_blank" onClick="closeMenu()">Get Support</a></li>
+					</ul>
+				</nav>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+	</header>
+
+</div>
+
+<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-W9ZD6Z" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-W9ZD6Z');</script>
+<!-- End Google Tag Manager -->
 </body>
 </html>
+
