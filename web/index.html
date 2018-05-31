@@ -187,16 +187,11 @@
 <script>
 $(function () {
 	var domain = 'https://builds.appcelerator.com',
-		platformsAll = {
-			'osx': 'OS X (iOS, Android, Mobile Web, BlackBerry)',
-			'linux': 'Linux (Android, Mobile Web, BlackBerry)',
-			'win32': 'Windows (Android, Mobile Web, BlackBerry)'
-		},
 		platforms = {
 			'default': {
-				'osx': 'OS X (iOS, Android, Mobile Web)',
-				'linux': 'Linux (Android, Mobile Web)',
-				'win32': 'Windows (Android, Mobile Web, Windows Phone)'
+				'osx': 'OS X (iOS, Android)',
+				'linux': 'Linux (Android)',
+				'win32': 'Windows (Android, Universal Windows Platform)'
 			}
 		},
 
@@ -311,7 +306,9 @@ $(function () {
 
 		releaseRegex = /^mobilesdk\-(\d\.\d\.\d+)(?:\.(.+))?\-([^\.]+)\.zip/,
 		branchRegex = /^mobilesdk\-(.+)(?:\.v|\-)((\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2}))\-([^\.]+)\.zip/,
-		docRegex = /^docs\-(\d{4})\-(\d{2})\-(\d{2})\_(\d{2})\-(\d{2})\-(\d{2})/;
+		docRegex = /^docs\-(\d{4})\-(\d{2})\-(\d{2})\_(\d{2})\-(\d{2})\-(\d{2})/,
+
+		MAX_BUILDS = 12; // Only load latest 12 builds per branch
 
 	function showBuilds(name) {
 		if (!name) return;
@@ -345,7 +342,7 @@ $(function () {
 
 				data.reverse();
 
-				for (var i = 0, l = 8; i < l && i < data.length; i++) {
+				for (var i = 0; i < data.length; i++) {
 
 					var build = data[i],
 						p = build.filename.match(branchRegex),
@@ -392,11 +389,16 @@ $(function () {
 						os.displayName = records[key].version + '.v' + p[2];
 					}
 
-					if(p) {
+					if (p) {
 						os.os = p[p.length-1];
 						os.title = (platforms[name] || platforms['default'])[p[p.length-1]];
 						records[key].os.push(os);
 						records[key].shas.push(build.sha1);
+					}
+
+					// Break out of loop once we have at least MAX_BUILDS records (the extra entry will get filtered due to not having all 3 platforms)
+					if (Object.keys(records).length > MAX_BUILDS) {
+						break;
 					}
 				}
 				doingUpdate = buildsCollection.selected === name;
@@ -528,7 +530,7 @@ $(function () {
 				<div class="clearfix"></div>
 				<span class="line"></span>
 				<div class="col-md-8 col-sm-9 col-xs-12">
-					<p>&copy;2008&ndash;2015 Appcelerator Inc. All rights reserved. Appcelerator and Titanium are registered <a href="https://www.appcelerator.com/legal/trademark-policy/">trademarks</a>.</p>
+					<p>&copy;2008&ndash;2018 Appcelerator Inc. All rights reserved. Appcelerator and Titanium are registered <a href="https://www.appcelerator.com/legal/trademark-policy/">trademarks</a>.</p>
 				</div>
 				<div class="last col-md-3 col-sm-3 col-xs-12 float-right">
 					<ul class="float-right">
@@ -550,8 +552,7 @@ $(function () {
 				<a href="" class="mobile-menu"><img src="images/nav-icon.png"></a>
 				<nav>
 					<ul class="sec-nav float-right">
-						<li><a href="#about" onClick="closeMenu()">About</a></li>
-						<li><a href="https://community.appcelerator.com" target="_blank" onClick="closeMenu()">Get Support</a></li>
+						<li><a href="https://community.appcelerator.com" target="_blank">Get Support</a></li>
 					</ul>
 				</nav>
 				<div class="clearfix"></div>
@@ -560,10 +561,5 @@ $(function () {
 	</header>
 
 </div>
-
-<!-- Google Tag Manager -->
-<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-W9ZD6Z" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-W9ZD6Z');</script>
-<!-- End Google Tag Manager -->
 </body>
 </html>
