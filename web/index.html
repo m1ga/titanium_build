@@ -371,6 +371,11 @@ $(function () {
 							size: build.size
 						};
 
+					// Break out of loop once we have MAX_BUILDS total records with a complete set of OS's for that version
+					if (!records[key] && Object.keys(records).length === MAX_BUILDS) {
+						break;
+					}
+
 					if (key) {
 						// it's a branch build;
 						if (!records[key]) {
@@ -396,23 +401,8 @@ $(function () {
 						records[key].os.push(os);
 						records[key].shas.push(build.sha1);
 					}
-
-					// Break out of loop once we have at least MAX_BUILDS records (the extra entry will get filtered due to not having all 3 platforms)
-					if (Object.keys(records).length > MAX_BUILDS) {
-						break;
-					}
 				}
 				doingUpdate = buildsCollection.selected === name;
-
-				// check that every build has 3 platforms
-				if (name != "docs") {
-					Object.keys(records).forEach(function (name) {
-						if (records[name].os.length < 3) {
-							console.log(name);
-							delete records[name];
-						}
-					});
-				}
 
 				buildsCollection[buildsCollection.selected === name ? 'set' : 'reset'](Object.keys(records).sort().reverse().map(function (d) {
 					return records[d];
