@@ -476,7 +476,8 @@ $(function () {
 		// get the first release
 		Backbone.history.start();
 		var r = (views.branches.model.attributes.branches || []).sort().reverse();
-		app.navigate($.cookie('selected') || r[0], { trigger: true });
+		// TODO: Move 'next' to end, sort numerically?
+		app.navigate($.cookie('selected') || views.branches.model.attributes.defaultBranch || r[0], { trigger: true });
 	});
 
 	Object.keys(views).forEach(function (type) {
