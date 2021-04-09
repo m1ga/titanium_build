@@ -186,6 +186,48 @@
 <script src="js/backbone-1.1.2-min.js"></script>
 
 <script>
+let defaultBranch = undefined;
+/**
+ * 
+ * @param {string} a 
+ * @param {string} b 
+ */
+function branchSort(a, b) {
+	// sort default branch "first"
+	if (a === defaultBranch) {
+		return -1;
+	}
+	if (b === defaultBranch) {
+		return 1;
+	}
+	// sort numeric branches numerically
+	const regexp = /(\d+)_(\d+)_(X|\d+)/;
+	const aMatch = a.match(regexp);
+	const bMatch = b.match(regexp);
+	if (aMatch && bMatch) {
+		const majorDiff = parseInt(bMatch[1]) - parseInt(aMatch[1]);
+		if (majorDiff != 0) {
+			return majorDiff;
+		}
+		const minorDiff = parseInt(bMatch[2]) - parseInt(aMatch[2]);
+		if (minorDiff != 0) {
+			return minorDiff;
+		}
+		// patch is either X (=== 0) or number
+		const aPatch = aMatch[3] === 'X' ? 0 : parseInt(aMatch[3]);
+		const bPatch = bMatch[3] === 'X' ? 0 : parseInt(bMatch[3]);
+		return bPatch - aPatch;
+	} else if (aMatch && !bMatch) {
+		// a is maintenance numeric branch, b is not
+		// sort "b" first
+		return 1;
+	} else if (!aMatch && bMatch) {
+		// b is maintenance numeric branch, a is not
+		// sort "a" first
+		return -1;
+	}
+	return b < a;
+}
 $(function () {
 	var domain = 'https://builds.appcelerator.com',
 		platforms = {
@@ -232,8 +274,8 @@ $(function () {
 				}
 			},
 			render: function () {
-				var type = this.model.type;
-				this.$el.html('<ul class="nav nav-list">' + this.model.attributes[type].sort().reverse().map(function (name) {
+				const type = this.model.type;
+				this.$el.html('<ul class="nav nav-list">' + this.model.attributes[type].sort(branchSort).map(function (name) {
 					return '<li class="nav-' + type + '" id="' + type + '_' + name.replace(/\./g, '') + '"><a href="#' + name + '">' + name + '</a></li>';
 				}, this).join('') + '</ul>');
 				return this;
@@ -473,11 +515,12 @@ $(function () {
 	});
 
 	var modelLoaded = _.after(Object.keys(views).length, function () {
-		// get the first release
+		defaultBranch = views.branches.model.attributes.defaultBranch;
 		Backbone.history.start();
-		var r = (views.branches.model.attributes.branches || []).sort().reverse();
-		// TODO: Move 'next' to end, sort numerically?
-		app.navigate($.cookie('selected') || views.branches.model.attributes.defaultBranch || r[0], { trigger: true });
+		// sort branches
+		var r = (views.branches.model.attributes.branches || []).sort(branchSort);
+		// select one saved from cookies, or the default branch from the JSON file
+		app.navigate($.cookie('selected') || defaultBranch || r[0], { trigger: true });
 	});
 
 	Object.keys(views).forEach(function (type) {
