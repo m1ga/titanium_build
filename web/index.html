@@ -3,7 +3,6 @@
 <head>
 	<title>Appcelerator Build Server</title>
 	<meta charset="utf8"/>
-	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,800,700,300,600' rel='stylesheet' type='text/css'/>
 	<link rel="shortcut icon" type="image/png" href="images/appc-favicon.ico"/>
 	<link rel="stylesheet" type="text/css" href="css2/bootstrap.css"/>
 	<link rel="stylesheet" type="text/css" href="css2/style.css"/>
@@ -90,8 +89,11 @@
 		font-weight: bold;
 	}
 	.osInfo {
-		margin-top: 5px;
+		margin-top: 15px;
 		max-width: 430px;
+	}
+	li .osInfo:first-of-type {
+		margin-top: 5px;
 	}
 	.osInfo a {
 		font-weight: bold;
@@ -188,9 +190,9 @@
 <script>
 let defaultBranch = undefined;
 /**
- * 
- * @param {string} a 
- * @param {string} b 
+ *
+ * @param {string} a
+ * @param {string} b
  */
 function branchSort(a, b) {
 	// sort default branch "first"
@@ -545,8 +547,8 @@ $(function () {
 			<div class="row">
 				<div class="first col-md-3 col-sm-3 col-xs-12">
 					<ul>
-						<li><a href="https://www.appcelerator.com/cat/developer">Dev Blog</a></li>
-						<li><a href="https://community.appcelerator.com">Support</a></li>
+						<li><a href="https://devblog.axway.com/">Dev Blog</a></li>
+						<li><a href="https://github.com/appcelerator/titanium_mobile/discussions">Support</a></li>
 					</ul>
 				</div>
 				<div class="col-md-3 col-md-offset-2 col-sm-4 col-xs-12">
@@ -554,18 +556,15 @@ $(function () {
 				</div>
 				<div class="col-md-4 col-sm-5 col-xs-12">
 					<ul class="social float-right">
-						<li><a href="https://twitter.com/appcelerator" target="_blank">Twitter</a></li>
-						<li><a href="https://www.facebook.com/appcelerator" target="_blank">Facebook</a></li>
-						<li><a href="https://plus.google.com/113266658339161020416/" target="_blank">Google+</a></li>
-						<li><a href="https://instagram.com/appcelerator" target="_blank">Instagram</a></li>
-						<li><a href="https://github.com/appcelerator" target="_blank">Github</a></li>
-						<li><a href="https://www.linkedin.com/company/200115" target="_blank">LinkedIn</a></li>
+						<li><a class="twitter" href="https://twitter.com/AxwayDev" target="_blank">Twitter</a></li>
+						<li><a class="github" href="https://github.com/appcelerator" target="_blank">Github</a></li>
+						<li><a class="linkedin" href="https://www.linkedin.com/company/axway/" target="_blank">LinkedIn</a></li>
 					</ul>
 				</div>
 				<div class="clearfix"></div>
 				<span class="line"></span>
 				<div class="col-md-8 col-sm-9 col-xs-12">
-					<p>&copy;2008&ndash;2018 Appcelerator Inc. All rights reserved. Appcelerator and Titanium are registered <a href="https://www.appcelerator.com/legal/trademark-policy/">trademarks</a>.</p>
+					<p>&copy;2008&ndash;2021 Appcelerator Inc. All rights reserved. Appcelerator and Titanium are registered <a href="https://www.appcelerator.com/legal/trademark-policy/">trademarks</a>.</p>
 				</div>
 				<div class="last col-md-3 col-sm-3 col-xs-12 float-right">
 					<ul class="float-right">
@@ -587,7 +586,7 @@ $(function () {
 				<a href="" class="mobile-menu"><img src="images/nav-icon.png"></a>
 				<nav>
 					<ul class="sec-nav float-right">
-						<li><a href="https://community.appcelerator.com" target="_blank">Get Support</a></li>
+						<li><a href="https://github.com/appcelerator/titanium_mobile/discussions" target="_blank">Get Support</a></li>
 					</ul>
 				</nav>
 				<div class="clearfix"></div>
